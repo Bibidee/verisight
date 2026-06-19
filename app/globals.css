@@ -1,0 +1,215 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --audit-black: #090B10;
+  --graphite-blue: #0F172A;
+  --frost-grey: #F3F6FA;
+  --white-ledger: #FFFFFF;
+  --blue-steel: #EAF0F8;
+  --grid-blue: #2563EB;
+  --exec-blue: #2563EB;
+  --data-cyan: #06B6D4;
+  --amber: #F59E0B;
+  --claim: #DC2626;
+  --emerald: #059669;
+  --consensus: #7C3AED;
+  --ink: #0F172A;
+  --ledger-white: #F8FAFC;
+  --slate: #64748B;
+  --auditline: #E2E8F0;
+  --ledger-line: #E2E8F0;
+  --glass-grid: rgba(148, 163, 184, 0.22);
+}
+
+html, body {
+  background: var(--frost-grey);
+  color: var(--ink);
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.display { font-family: var(--font-space-grotesk), system-ui, sans-serif; letter-spacing: -0.01em; }
+.mono    { font-family: var(--font-jetbrains-mono), ui-monospace, monospace; font-feature-settings: "ss01","ss02"; }
+
+/* ------------- BUTTONS ------------- */
+.btn-primary {
+  background: var(--audit-black); color: #fff;
+  border-radius: 8px; padding: 9px 14px;
+  font-weight: 600; font-size: 13.5px;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: opacity .15s ease, transform .05s ease;
+}
+.btn-primary:hover  { opacity: .94; }
+.btn-primary:active { transform: translateY(1px); }
+.btn-secondary {
+  background: var(--white-ledger); color: var(--ink);
+  border: 1px solid var(--auditline); border-radius: 8px;
+  padding: 8px 13px; font-weight: 600; font-size: 13.5px;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-secondary:hover { background: var(--frost-grey); }
+.btn-exec {
+  background: var(--exec-blue); color: #fff;
+  border-radius: 8px; padding: 9px 14px;
+  font-weight: 600; font-size: 13.5px;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-exec:hover { background: #1F49C7; }
+.btn-consensus {
+  background: var(--consensus); color: #fff;
+  border-radius: 8px; padding: 9px 14px;
+  font-weight: 600; font-size: 13.5px;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: box-shadow .25s ease;
+}
+.btn-consensus:hover { box-shadow: 0 0 0 4px rgba(124,58,237,0.15); }
+.btn-danger {
+  background: var(--claim); color: #fff;
+  border-radius: 8px; padding: 9px 14px;
+  font-weight: 600; font-size: 13.5px;
+}
+.btn-ghost {
+  background: transparent; color: var(--ink);
+  border: 1px dashed var(--auditline); border-radius: 8px;
+  padding: 8px 13px; font-weight: 500; font-size: 13px;
+}
+
+/* ------------- DOCUMENTS / PANELS ------------- */
+.doc {
+  background: var(--white-ledger);
+  border: 1px solid var(--auditline);
+  border-radius: 12px;
+  box-shadow: 0 1px 0 rgba(15,23,42,0.04), 0 8px 24px -18px rgba(15,23,42,0.18);
+}
+.doc-header {
+  background: var(--audit-black); color: var(--ledger-white);
+  border-radius: 12px 12px 0 0;
+  padding: 14px 18px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.doc-body { padding: 20px; }
+.doc-footer {
+  border-top: 1px solid var(--auditline);
+  padding: 12px 18px;
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--frost-grey);
+  border-radius: 0 0 12px 12px;
+}
+
+/* legacy panel classes (old code still uses these — render as light doc) */
+.panel        { background: var(--white-ledger); border: 1px solid var(--auditline); border-radius: 12px; box-shadow: 0 1px 0 rgba(15,23,42,0.04), 0 8px 24px -18px rgba(15,23,42,0.18); }
+.panel-dark   { background: var(--graphite-blue); color: var(--ledger-white); border: 1px solid var(--glass-grid); border-radius: 12px; }
+.panel-darker { background: var(--audit-black); color: var(--ledger-white); border: 1px solid var(--glass-grid); border-radius: 12px; }
+.panel-steel  { background: var(--blue-steel); color: var(--ink); border: 1px solid var(--auditline); border-radius: 12px; }
+.panel-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; border-bottom: 1px solid var(--auditline); }
+.panel-header.dark { border-bottom-color: var(--glass-grid); }
+
+.eyebrow {
+  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+  font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--consensus);
+}
+.eyebrow-slate { color: var(--slate); }
+
+/* ------------- BADGES / PILLS ------------- */
+.badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  border-radius: 999px; padding: 3px 9px;
+  font-size: 11.5px; font-weight: 600;
+  border: 1px solid transparent;
+}
+.badge-consensus { background: rgba(124,58,237,0.10); color: var(--consensus); border-color: rgba(124,58,237,0.30); }
+.badge-verified  { background: rgba(5,150,105,0.10);  color: var(--emerald);  border-color: rgba(5,150,105,0.30); }
+.badge-amber     { background: rgba(245,158,11,0.10); color: var(--amber);    border-color: rgba(245,158,11,0.32); }
+.badge-claim     { background: rgba(220,38,38,0.10);  color: var(--claim);    border-color: rgba(220,38,38,0.32); }
+.badge-cyan      { background: rgba(6,182,212,0.10);  color: var(--data-cyan);border-color: rgba(6,182,212,0.32); }
+.badge-blue      { background: rgba(37,99,235,0.10);  color: var(--exec-blue);border-color: rgba(37,99,235,0.32); }
+.badge-slate     { background: rgba(100,116,139,0.10);color: var(--slate);    border-color: rgba(100,116,139,0.28); }
+.badge-dark      { background: rgba(248,250,252,0.07);color: var(--ledger-white); border-color: var(--glass-grid); }
+
+/* ------------- INPUTS ------------- */
+.input {
+  width: 100%; border-radius: 8px;
+  border: 1px solid var(--auditline); background: var(--white-ledger);
+  padding: 10px 12px; font-size: 14px; color: var(--ink);
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.input::placeholder { color: var(--slate); }
+.input:focus {
+  outline: none; border-color: var(--exec-blue);
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+}
+
+/* ------------- TABLES (LEDGER) ------------- */
+.ledger-table { width: 100%; font-size: 13.5px; border-collapse: separate; border-spacing: 0; }
+.ledger-table thead th {
+  position: sticky; top: 0;
+  text-align: left; padding: 10px 16px;
+  font-size: 10.5px; font-weight: 600; letter-spacing: 0.10em;
+  text-transform: uppercase; color: var(--slate);
+  background: var(--frost-grey); border-bottom: 1px solid var(--auditline);
+}
+.ledger-table tbody td { padding: 12px 16px; border-top: 1px solid var(--auditline); vertical-align: top; }
+.ledger-table tbody tr:hover { background: var(--frost-grey); }
+
+/* ------------- STATUS DOTS ------------- */
+.dot { width: 7px; height: 7px; border-radius: 999px; display: inline-block; }
+.dot-consensus { background: var(--consensus); box-shadow: 0 0 0 4px rgba(124,58,237,0.18); animation: pulseDot 1.6s ease-in-out infinite; }
+.dot-verified  { background: var(--emerald); }
+.dot-amber     { background: var(--amber); }
+.dot-claim     { background: var(--claim); }
+.dot-cyan      { background: var(--data-cyan); box-shadow: 0 0 0 4px rgba(6,182,212,0.18); animation: pulseDot 1.6s ease-in-out infinite; }
+.dot-slate     { background: var(--slate); }
+
+/* ------------- METER BARS ------------- */
+.meter { height: 6px; border-radius: 999px; background: var(--auditline); overflow: hidden; }
+.meter > .fill { height: 100%; border-radius: 999px; }
+
+/* ------------- HASH TEXT ------------- */
+.hash {
+  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+  font-size: 11.5px; color: var(--ink);
+  background: var(--frost-grey); border: 1px solid var(--auditline);
+  border-radius: 5px; padding: 1px 6px; word-break: break-all;
+}
+.hash-dark {
+  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+  font-size: 11.5px; color: var(--ledger-white);
+  background: rgba(248,250,252,0.06); border: 1px solid var(--glass-grid);
+  border-radius: 5px; padding: 1px 6px; word-break: break-all;
+}
+
+/* ------------- LINK ------------- */
+.link { color: var(--exec-blue); text-decoration: underline; text-underline-offset: 3px; }
+.link:hover { color: #1F49C7; }
+
+/* ------------- STAMP ------------- */
+.stamp {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 2px solid var(--consensus); color: var(--consensus);
+  border-radius: 4px; padding: 6px 12px;
+  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+  font-size: 11.5px; letter-spacing: 0.14em; text-transform: uppercase;
+  transform: rotate(-2deg);
+  background: rgba(124,58,237,0.04);
+  animation: stampIn .6s ease-out both;
+  box-shadow: 0 0 0 1px rgba(124,58,237,0.35), 0 0 0 6px rgba(124,58,237,0.06);
+}
+
+/* ------------- DOCKET PAPER LINES ------------- */
+.docket-lines {
+  background-image:
+    repeating-linear-gradient(to bottom, transparent 0 27px, rgba(148,163,184,0.16) 27px 28px);
+}
+
+/* ------------- DARK STRIP ------------- */
+.audit-strip {
+  background: var(--audit-black); color: var(--ledger-white);
+  border-radius: 8px; padding: 10px 14px;
+  display: flex; align-items: center; gap: 12px;
+  font-size: 12.5px;
+  border: 1px solid var(--glass-grid);
+}
