@@ -42,6 +42,31 @@ export default async function AssuranceDeskPage() {
         .single()
     : { data: null };
 
+  // Business risk queue — all issued verdicts with a business risk
+  const { data: riskVerdicts } = await supabase
+    .from("genlayer_audit_verdicts")
+    .select("audit_case_id,verdict,business_risk,created_at")
+    .eq("consensus_status", "reached")
+    .not("business_risk", "is", null)
+    .order("created_at", { ascending: false })
+    .limit(4);
+
+  const riskCaseIds = (riskVerdicts ?? []).map((r) => r.audit_case_id);
+  const { data: riskCases } = riskCaseIds.length > 0
+    ? await supabase
+        .from("insight_audit_cases")
+        .select("id,insight_claim")
+        .in("id", riskCaseIds)
+    : { data: [] };
+
+  // Draft decision memos — verdict_issued audits
+  const { data: memoDrafts } = await supabase
+    .from("insight_audit_cases")
+    .select("id,insight_claim,metric_name,created_at")
+    .eq("status", "verdict_issued")
+    .order("created_at", { ascending: false })
+    .limit(4);
+
   return (
     <>
       <SubContextBar
@@ -77,10 +102,10 @@ export default async function AssuranceDeskPage() {
                   <JudgmentStamp />
                 </div>
                 <div className="grid grid-cols-2 gap-px bg-auditline lg:grid-cols-4">
-                  <Cell label="Verdict" value={latestVerdict.verdict ?? "—"} accent />
-                  <Cell label="Support level" value={latestVerdict.support_level ?? "—"} />
-                  <Cell label="Confidence" value={latestVerdict.confidence_label ?? "—"} />
-                  <Cell label="Business risk" value={latestVerdict.business_risk ?? "—"} />
+                  <Cell label="Verdict" value={fmt(latestVerdict.verdict)} accent />
+                  <Cell label="Support level" value={fmt(latestVerdict.support_level)} />
+                  <Cell label="Confidence" value={fmt(latestVerdict.confidence_label)} />
+                  <Cell label="Business risk" value={truncate(latestVerdict.business_risk ?? "—", 80)} />
                 </div>
                 <div className="px-5 py-4 flex flex-wrap items-center justify-between gap-3">
                   <SupportBadge verdict={latestVerdict.verdict as import("@/components/audit/SupportBadge").Verdict} />
@@ -158,15 +183,44 @@ export default async function AssuranceDeskPage() {
 
         {/* Bottom — risk queue + drafts + activity */}
         <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <article className="doc">
+          <article className="doc overflow-hidden">
             <Head title="Business risk queue" eyebrow="High & moderate" />
-            <EmptyState title="No risks queued"
-              body="High-risk judgments will appear here so executives can review them before acting." />
+            {riskVerdicts && riskVerdicts.length > 0 ? (
+              <div className="divide-y divide-auditline">
+                {riskVerdicts.map((r) => {
+                  const claim = riskCases?.find((c) => c.id === r.audit_case_id)?.insight_claim ?? "—";
+                  return (
+                    <Link key={r.audit_case_id} href={`/audits/${r.audit_case_id}`}
+                      className="block px-5 py-3 hover:bg-slate-50 transition-colors">
+                      <div className="text-[12.5px] font-medium text-ink truncate">{claim}</div>
+                      <div className="mono text-[10.5px] text-slate mt-0.5">{fmt(r.verdict)} · {new Date(r.created_at).toLocaleDateString()}</div>
+                      <div className="text-[11.5px] text-claim mt-1 line-clamp-2">{r.business_risk}</div>
+                    </Link>
+                  );
+                })}
+              </div>
+            ) : (
+              <EmptyState title="No risks queued"
+                body="High-risk judgments will appear here so executives can review them before acting." />
+            )}
           </article>
-          <article className="doc">
+          <article className="doc overflow-hidden">
             <Head title="Draft decision memos" eyebrow="Awaiting executive review" />
-            <EmptyState title="No memos drafted"
-              body="Once a judgment is issued, you can convert it into an executive-ready decision memo." />
+            {memoDrafts && memoDrafts.length > 0 ? (
+              <div className="divide-y divide-auditline">
+                {memoDrafts.map((m) => (
+                  <Link key={m.id} href={`/audits/${m.id}`}
+                    className="block px-5 py-3 hover:bg-slate-50 transition-colors">
+                    <div className="text-[12.5px] font-medium text-ink truncate">{m.insight_claim}</div>
+                    <div className="mono text-[10.5px] text-slate mt-0.5">{m.metric_name ?? "—"} · {new Date(m.created_at).toLocaleDateString()}</div>
+                    <div className="mono text-[10px] mt-1 text-consensus uppercase tracking-[0.12em]">Ready to export</div>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <EmptyState title="No memos drafted"
+                body="Once a judgment is issued, you can convert it into an executive-ready decision memo." />
+            )}
           </article>
           <article className="doc-header rounded-panel overflow-hidden border border-glass-grid"
                    style={{ background: "var(--audit-black)" }}>
@@ -188,6 +242,14 @@ export default async function AssuranceDeskPage() {
       </main>
     </>
   );
+}
+
+function fmt(v: string | null | undefined): string {
+  if (!v) return "—";
+  return v.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+function truncate(s: string, n: number): string {
+  return s.length > n ? s.slice(0, n) + "…" : s;
 }
 
 function Head({ title, eyebrow, right }: { title: string; eyebrow: string; right?: React.ReactNode }) {
