@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getProfile, isAdminUser } from "@/lib/auth/getUser";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { SubContextBar } from "@/components/app/SubContextBar";
 import { Badge } from "@/components/audit/Badge";
 import { EmptyState } from "@/components/audit/EmptyState";
@@ -7,15 +8,18 @@ import { HashText } from "@/components/audit/HashText";
 import { ConsensusBadge } from "@/components/audit/ConsensusBadge";
 
 export default async function AdminPage() {
-  const { user, profile, supabase } = await getProfile();
+  const { user } = await getProfile();
   if (!isAdminUser(user.email)) redirect("/dashboard");
 
-  const { data: cases } = await supabase
-    .from("insight_audit_cases").select("id,insight_claim,status,created_at")
+  // Use service role client to bypass RLS and see all users' data
+  const admin = createSupabaseAdminClient();
+
+  const { data: cases } = await admin
+    .from("insight_audit_cases").select("id,insight_claim,status,created_at,user_id")
     .order("created_at", { ascending: false }).limit(50);
-  const { data: logs } = await supabase
+  const { data: logs } = await admin
     .from("contract_activity_logs")
-    .select("id,contract_address,transaction_hash,action,status,created_at")
+    .select("id,contract_address,transaction_hash,action,status,created_at,error_message")
     .order("created_at", { ascending: false }).limit(50);
 
   return (
