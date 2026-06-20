@@ -26,6 +26,22 @@ export default async function AssuranceDeskPage() {
     .order("created_at", { ascending: false })
     .limit(5);
 
+  const { data: latestVerdict } = await supabase
+    .from("genlayer_audit_verdicts")
+    .select("audit_case_id,verdict,support_level,confidence_label,business_risk,reasoning_summary,consensus_status,created_at")
+    .eq("consensus_status", "reached")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const { data: latestVerdictCase } = latestVerdict
+    ? await supabase
+        .from("insight_audit_cases")
+        .select("insight_claim")
+        .eq("id", latestVerdict.audit_case_id)
+        .single()
+    : { data: null };
+
   return (
     <>
       <SubContextBar
@@ -47,30 +63,43 @@ export default async function AssuranceDeskPage() {
         {/* Top — latest judgment summary + dataset freshness */}
         <section className="grid grid-cols-1 gap-4 lg:grid-cols-[1.6fr_1fr]">
           <article className="doc overflow-hidden">
-            <div className="doc-header">
-              <div>
-                <div className="mono text-[10.5px] uppercase tracking-[0.18em] text-ledger-white/55">
-                  Latest GenLayer judgment · sample
+            {latestVerdict && latestVerdictCase ? (
+              <>
+                <div className="doc-header">
+                  <div>
+                    <div className="mono text-[10.5px] uppercase tracking-[0.18em] text-ledger-white/55">
+                      Latest GenLayer judgment
+                    </div>
+                    <div className="display text-[18px] font-semibold">
+                      {latestVerdictCase.insight_claim}
+                    </div>
+                  </div>
+                  <JudgmentStamp />
                 </div>
-                <div className="display text-[18px] font-semibold">
-                  Revenue growth was mainly driven by repeat customers.
+                <div className="grid grid-cols-2 gap-px bg-auditline lg:grid-cols-4">
+                  <Cell label="Verdict" value={latestVerdict.verdict ?? "—"} accent />
+                  <Cell label="Support level" value={latestVerdict.support_level ?? "—"} />
+                  <Cell label="Confidence" value={latestVerdict.confidence_label ?? "—"} />
+                  <Cell label="Business risk" value={latestVerdict.business_risk ?? "—"} />
                 </div>
+                <div className="px-5 py-4 flex flex-wrap items-center justify-between gap-3">
+                  <SupportBadge verdict={latestVerdict.verdict as import("@/components/audit/SupportBadge").Verdict} />
+                  <Link href={`/audits/${latestVerdict.audit_case_id}`} className="link text-sm">View full judgment →</Link>
+                </div>
+              </>
+            ) : (
+              <div className="doc-header">
+                <div>
+                  <div className="mono text-[10.5px] uppercase tracking-[0.18em] text-ledger-white/55">
+                    Latest GenLayer judgment
+                  </div>
+                  <div className="display text-[18px] font-semibold text-ledger-white/60">
+                    No verdicts issued yet
+                  </div>
+                </div>
+                <JudgmentStamp />
               </div>
-              <JudgmentStamp />
-            </div>
-            <div className="grid grid-cols-2 gap-px bg-auditline lg:grid-cols-4">
-              <Cell label="Verdict" value="Partially supported" accent />
-              <Cell label="Support level" value="Moderate" />
-              <Cell label="Confidence" value="Moderate" />
-              <Cell label="Business risk" value="Claim may overstate causality" />
-            </div>
-            <div className="px-5 py-4 flex flex-wrap items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <SupportBadge verdict="partially_supported" />
-                <Badge tone="amber" dot>Causality risk</Badge>
-              </div>
-              <Link href="/verdicts" className="link text-sm">View judgment archive →</Link>
-            </div>
+            )}
           </article>
 
           <article className="doc p-5">
