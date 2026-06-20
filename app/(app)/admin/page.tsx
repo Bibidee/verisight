@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getProfile } from "@/lib/auth/getUser";
+import { getProfile, isAdminUser } from "@/lib/auth/getUser";
 import { SubContextBar } from "@/components/app/SubContextBar";
 import { Badge } from "@/components/audit/Badge";
 import { EmptyState } from "@/components/audit/EmptyState";
@@ -7,8 +7,8 @@ import { HashText } from "@/components/audit/HashText";
 import { ConsensusBadge } from "@/components/audit/ConsensusBadge";
 
 export default async function AdminPage() {
-  const { profile, supabase } = await getProfile();
-  if (profile?.role !== "admin") redirect("/dashboard");
+  const { user, profile, supabase } = await getProfile();
+  if (!isAdminUser(user.email)) redirect("/dashboard");
 
   const { data: cases } = await supabase
     .from("insight_audit_cases").select("id,insight_claim,status,created_at")

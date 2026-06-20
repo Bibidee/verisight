@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getProfile } from "@/lib/auth/getUser";
+import { getProfile, isAdminUser } from "@/lib/auth/getUser";
 import { ExecutiveTopNav } from "@/components/app/ExecutiveTopNav";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -8,7 +8,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="min-h-screen bg-frost-grey">
-      <ExecutiveTopNav email={user.email ?? ""} displayName={profile.display_name} />
+      <ExecutiveTopNav
+        email={user.email ?? ""}
+        displayName={profile.display_name}
+        isAdmin={isAdminUser(user.email)}
+      />
       <div className="mx-auto w-full max-w-[1400px]">{children}</div>
     </div>
   );

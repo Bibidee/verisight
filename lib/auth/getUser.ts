@@ -8,6 +8,14 @@ export async function requireUser() {
   return { user: data.user, supabase };
 }
 
+const ADMIN_EMAILS = new Set([
+  "ojikutusarat@gmail.com",
+]);
+
+export function isAdminUser(email: string | undefined | null): boolean {
+  return !!email && ADMIN_EMAILS.has(email.toLowerCase());
+}
+
 export async function getProfile() {
   const { user, supabase } = await requireUser();
   const { data: profile } = await supabase

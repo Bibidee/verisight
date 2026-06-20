@@ -14,8 +14,7 @@ const PRIMARY = [
   { href: "/memos",      label: "Decision Memos" },
   { href: "/workspaces", label: "Workspaces" },
 ];
-const SECONDARY = [
-  { href: "/admin",    label: "Admin" },
+const SECONDARY_BASE = [
   { href: "/profile",  label: "Profile" },
   { href: "/settings", label: "Settings" },
 ];
@@ -27,11 +26,16 @@ function isActive(path: string, href: string) {
 export function ExecutiveTopNav({
   email,
   displayName,
+  isAdmin,
 }: {
   email: string;
   displayName?: string | null;
+  isAdmin?: boolean;
 }) {
   const path = usePathname();
+  const SECONDARY = isAdmin
+    ? [{ href: "/admin", label: "Admin" }, ...SECONDARY_BASE]
+    : SECONDARY_BASE;
   return (
     <header className="sticky top-0 z-30 border-b border-auditline bg-audit-black text-ledger-white">
       <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-6 px-6 py-3">
